@@ -665,6 +665,64 @@ def converts():
 
 
 # ==========================================
+# CONVERT NEW CONVERT INTO MEMBER
+# ==========================================
+
+@app.route(
+    "/convert-to-member/<int:convert_id>",
+    methods=["GET", "POST"]
+)
+def convert_to_member(convert_id):
+
+    convert = NewConvert.query.get_or_404(
+        convert_id
+    )
+
+
+    # Create member from convert information
+
+    new_member = Member(
+
+        full_name=convert.full_name,
+
+        gender=convert.gender,
+
+        age=convert.age,
+
+        phone=convert.phone,
+
+        department=convert.department,
+
+        date_joined=convert.conversion_date,
+
+        status="Active"
+
+    )
+
+
+    # Save new member
+
+    db.session.add(
+        new_member
+    )
+
+
+    # Remove from new converts
+
+    db.session.delete(
+        convert
+    )
+
+
+    db.session.commit()
+
+
+    return redirect(
+        url_for("members")
+    )
+
+
+# ==========================================
 # RUN APPLICATION
 # ==========================================
 
