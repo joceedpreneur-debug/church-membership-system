@@ -115,10 +115,58 @@ class Attendance(db.Model):
         nullable=False
     )
 
-    # Connect attendance record to member
     member = db.relationship(
         "Member",
         backref="attendance_records"
+    )
+
+
+# ==========================================
+# NEW CONVERT MODEL
+# ==========================================
+
+class NewConvert(db.Model):
+
+    __tablename__ = "new_converts"
+
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    full_name = db.Column(
+        db.String(150),
+        nullable=False
+    )
+
+    gender = db.Column(
+        db.String(20)
+    )
+
+    age = db.Column(
+        db.Integer
+    )
+
+    phone = db.Column(
+        db.String(30)
+    )
+
+    conversion_date = db.Column(
+        db.String(30),
+        nullable=False
+    )
+
+    service_type = db.Column(
+        db.String(100)
+    )
+
+    follow_up_status = db.Column(
+        db.String(50),
+        default="Pending"
+    )
+
+    department = db.Column(
+        db.String(100)
     )
 
 
@@ -170,7 +218,11 @@ def dashboard():
     ).count()
 
 
-    # Calculate attendance percentage
+    # New converts
+    total_converts = NewConvert.query.count()
+
+
+    # Attendance percentage
     if total_attendance > 0:
 
         attendance_percentage = round(
@@ -188,9 +240,14 @@ def dashboard():
 
     return render_template(
         "dashboard.html",
+
         total_members=total_members,
+
         active_members=active_members,
-        attendance=attendance_percentage
+
+        attendance=attendance_percentage,
+
+        total_converts=total_converts
     )
 
 
@@ -390,6 +447,121 @@ def attendance_history():
     return render_template(
         "attendance_history.html",
         records=records
+    )
+
+
+# ==========================================
+# NEW CONVERT PAGE
+# ==========================================
+
+@app.route("/add-convert")
+def add_convert():
+
+    return render_template(
+        "add_convert.html"
+    )
+
+
+# ==========================================
+# SAVE NEW CONVERT
+# ==========================================
+
+@app.route(
+    "/add-convert",
+    methods=["POST"]
+)
+def save_convert():
+
+    full_name = request.form.get(
+        "full_name"
+    )
+
+    gender = request.form.get(
+        "gender"
+    )
+
+    age = request.form.get(
+        "age"
+    )
+
+    phone = request.form.get(
+        "phone"
+    )
+
+    conversion_date = request.form.get(
+        "conversion_date"
+    )
+
+    service_type = request.form.get(
+        "service_type"
+    )
+
+    follow_up_status = request.form.get(
+        "follow_up_status"
+    )
+
+    department = request.form.get(
+        "department"
+    )
+
+
+    if age:
+
+        age = int(age)
+
+    else:
+
+        age = None
+
+
+    new_convert = NewConvert(
+
+        full_name=full_name,
+
+        gender=gender,
+
+        age=age,
+
+        phone=phone,
+
+        conversion_date=conversion_date,
+
+        service_type=service_type,
+
+        follow_up_status=follow_up_status,
+
+        department=department
+
+    )
+
+
+    db.session.add(
+        new_convert
+    )
+
+    db.session.commit()
+
+
+    return redirect(
+        url_for("converts")
+    )
+
+
+# ==========================================
+# VIEW NEW CONVERTS
+# ==========================================
+
+@app.route("/converts")
+def converts():
+
+    all_converts = NewConvert.query.order_by(
+        NewConvert.id.desc()
+    ).all()
+
+
+    return render_template(
+        "converts.html",
+        converts=all_converts
     )
 
 
