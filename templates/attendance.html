@@ -8,26 +8,21 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Record Attendance</title>
+    <title>Attendance History</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
           rel="stylesheet">
 
 </head>
 
-
 <body class="bg-light">
-
 
 <nav class="navbar navbar-dark bg-primary">
 
     <div class="container">
 
-        <a class="navbar-brand"
-           href="/dashboard">
-
+        <a class="navbar-brand" href="/dashboard">
             Church Membership System
-
         </a>
 
     </div>
@@ -37,144 +32,103 @@
 
 <div class="container mt-4">
 
-    <div class="row justify-content-center">
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-        <div class="col-md-8">
+        <h2>Attendance History</h2>
 
-            <div class="card shadow">
+        <a href="/attendance"
+           class="btn btn-primary">
 
-                <div class="card-body">
+            Record Attendance
 
-                    <h3 class="mb-4">
-                        Record Attendance
-                    </h3>
+        </a>
 
-
-                    <form method="POST"
-                          action="/attendance">
+    </div>
 
 
-                        <div class="mb-3">
+    <div class="card shadow">
 
-                            <label class="form-label">
-                                Select Member
-                            </label>
+        <div class="card-body">
 
-                            <select name="member_id"
-                                    class="form-select"
-                                    required>
+            <div class="table-responsive">
 
-                                <option value="">
-                                    Select Member
-                                </option>
+                <table class="table table-striped">
 
+                    <thead class="table-primary">
 
-                                {% for member in members %}
+                        <tr>
 
-                                <option value="{{ member.id }}">
+                            <th>ID</th>
+                            <th>Member ID</th>
+                            <th>Date</th>
+                            <th>Service</th>
+                            <th>Status</th>
 
-                                    {{ member.full_name }}
+                        </tr>
 
-                                </option>
-
-                                {% endfor %}
-
-                            </select>
-
-                        </div>
+                    </thead>
 
 
-                        <div class="mb-3">
+                    <tbody>
 
-                            <label class="form-label">
-                                Attendance Date
-                            </label>
+                        {% for record in records %}
 
-                            <input type="date"
-                                   name="attendance_date"
-                                   class="form-control"
-                                   required>
+                        <tr>
 
-                        </div>
+                            <td>
+                                {{ record.id }}
+                            </td>
 
+                            <td>
+                                {{ record.member_id }}
+                            </td>
 
-                        <div class="mb-3">
+                            <td>
+                                {{ record.attendance_date }}
+                            </td>
 
-                            <label class="form-label">
-                                Service Type
-                            </label>
+                            <td>
+                                {{ record.service_type }}
+                            </td>
 
-                            <select name="service_type"
-                                    class="form-select"
-                                    required>
+                            <td>
 
-                                <option value="">
-                                    Select Service
-                                </option>
+                                {% if record.attendance_status == "Present" %}
 
-                                <option value="Sunday Service">
-                                    Sunday Service
-                                </option>
+                                    <span class="badge bg-success">
+                                        Present
+                                    </span>
 
-                                <option value="Midweek Service">
-                                    Midweek Service
-                                </option>
+                                {% else %}
 
-                                <option value="Special Programme">
-                                    Special Programme
-                                </option>
+                                    <span class="badge bg-danger">
+                                        Absent
+                                    </span>
 
-                                <option value="Other">
-                                    Other
-                                </option>
+                                {% endif %}
 
-                            </select>
+                            </td>
 
-                        </div>
+                        </tr>
 
+                        {% else %}
 
-                        <div class="mb-4">
+                        <tr>
 
-                            <label class="form-label">
-                                Attendance Status
-                            </label>
+                            <td colspan="5"
+                                class="text-center">
 
-                            <select name="attendance_status"
-                                    class="form-select"
-                                    required>
+                                No attendance records yet.
 
-                                <option value="Present">
-                                    Present
-                                </option>
+                            </td>
 
-                                <option value="Absent">
-                                    Absent
-                                </option>
+                        </tr>
 
-                            </select>
+                        {% endfor %}
 
-                        </div>
+                    </tbody>
 
-
-                        <button type="submit"
-                                class="btn btn-primary">
-
-                            Save Attendance
-
-                        </button>
-
-
-                        <a href="/attendance-history"
-                           class="btn btn-secondary">
-
-                            Attendance History
-
-                        </a>
-
-
-                    </form>
-
-                </div>
+                </table>
 
             </div>
 
@@ -182,8 +136,19 @@
 
     </div>
 
-</div>
 
+    <div class="mt-3">
+
+        <a href="/dashboard"
+           class="btn btn-secondary">
+
+            Back to Dashboard
+
+        </a>
+
+    </div>
+
+</div>
 
 </body>
 
