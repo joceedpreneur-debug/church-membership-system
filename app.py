@@ -7,6 +7,10 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 
+# ==========================================
+# APPLICATION SETTINGS
+# ==========================================
+
 app.config["SECRET_KEY"] = os.environ.get(
     "SECRET_KEY",
     "temporary-development-key"
@@ -111,6 +115,12 @@ class Attendance(db.Model):
         nullable=False
     )
 
+    # Connect attendance record to member
+    member = db.relationship(
+        "Member",
+        backref="attendance_records"
+    )
+
 
 # ==========================================
 # CREATE DATABASE TABLES
@@ -122,7 +132,7 @@ with app.app_context():
 
 
 # ==========================================
-# HOME
+# HOME / LOGIN
 # ==========================================
 
 @app.route("/")
@@ -140,21 +150,27 @@ def home():
 @app.route("/dashboard")
 def dashboard():
 
+    # Total members
     total_members = Member.query.count()
 
+
+    # Active members
     active_members = Member.query.filter_by(
         status="Active"
     ).count()
 
 
+    # Total attendance records
     total_attendance = Attendance.query.count()
 
 
+    # Present attendance records
     present_attendance = Attendance.query.filter_by(
         attendance_status="Present"
     ).count()
 
 
+    # Calculate attendance percentage
     if total_attendance > 0:
 
         attendance_percentage = round(
@@ -198,7 +214,6 @@ def add_member():
     "/add-member",
     methods=["POST"]
 )
-
 def save_member():
 
     full_name = request.form.get(
@@ -316,7 +331,6 @@ def attendance():
     "/attendance",
     methods=["POST"]
 )
-
 def save_attendance():
 
     member_id = request.form.get(
@@ -368,13 +382,7 @@ def save_attendance():
 @app.route("/attendance-history")
 def attendance_history():
 
-    records = db.session.query(
-        Attendance,
-        Member
-    ).join(
-        Member,
-        Attendance.member_id == Member.id
-    ).order_by(
+    records = Attendance.query.order_by(
         Attendance.id.desc()
     ).all()
 
