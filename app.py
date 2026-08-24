@@ -11,8 +11,11 @@ app.config["SECRET_KEY"] = os.environ.get(
     "temporary-development-key"
 )
 
+
+# Get database URL from Render
 database_url = os.environ.get("DATABASE_URL")
 
+# Convert old postgres:// format to postgresql://
 if database_url:
     database_url = database_url.replace(
         "postgres://",
@@ -25,6 +28,10 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
 
+
+# =========================
+# MEMBER DATABASE TABLE
+# =========================
 
 class Member(db.Model):
 
@@ -66,6 +73,18 @@ class Member(db.Model):
     )
 
 
+# =========================
+# CREATE DATABASE TABLES
+# =========================
+
+with app.app_context():
+    db.create_all()
+
+
+# =========================
+# HOME PAGE
+# =========================
+
 @app.route("/")
 def home():
 
@@ -73,6 +92,10 @@ def home():
         "login.html"
     )
 
+
+# =========================
+# DASHBOARD
+# =========================
 
 @app.route("/dashboard")
 def dashboard():
@@ -90,11 +113,11 @@ def dashboard():
     )
 
 
+# =========================
+# RUN APPLICATION
+# =========================
+
 if __name__ == "__main__":
-
-    with app.app_context():
-
-        db.create_all()
 
     app.run(
         debug=True
