@@ -213,6 +213,8 @@ def dashboard():
     total_converts = NewConvert.query.count()
 
 
+    # Calculate attendance percentage
+
     if total_attendance > 0:
 
         attendance_percentage = round(
@@ -365,8 +367,6 @@ def edit_member(member_id):
     )
 
 
-    # SAVE EDITED MEMBER
-
     if request.method == "POST":
 
         member.full_name = request.form.get(
@@ -416,8 +416,6 @@ def edit_member(member_id):
         )
 
 
-    # SHOW EDIT PAGE
-
     return render_template(
         "edit_member.html",
         member=member
@@ -438,8 +436,7 @@ def delete_member(member_id):
     )
 
 
-    # Delete attendance records belonging
-    # to this member first
+    # Delete attendance records first
 
     Attendance.query.filter_by(
         member_id=member.id
@@ -453,7 +450,6 @@ def delete_member(member_id):
     db.session.delete(
         member
     )
-
 
     db.session.commit()
 
