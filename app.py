@@ -198,31 +198,21 @@ def home():
 @app.route("/dashboard")
 def dashboard():
 
-    # Total members
     total_members = Member.query.count()
 
-
-    # Active members
     active_members = Member.query.filter_by(
         status="Active"
     ).count()
 
-
-    # Total attendance records
     total_attendance = Attendance.query.count()
 
-
-    # Present attendance records
     present_attendance = Attendance.query.filter_by(
         attendance_status="Present"
     ).count()
 
-
-    # New converts
     total_converts = NewConvert.query.count()
 
 
-    # Attendance percentage
     if total_attendance > 0:
 
         attendance_percentage = round(
@@ -357,6 +347,119 @@ def members():
     return render_template(
         "members.html",
         members=all_members
+    )
+
+
+# ==========================================
+# EDIT MEMBER
+# ==========================================
+
+@app.route(
+    "/edit-member/<int:member_id>",
+    methods=["GET", "POST"]
+)
+def edit_member(member_id):
+
+    member = Member.query.get_or_404(
+        member_id
+    )
+
+
+    # SAVE EDITED MEMBER
+
+    if request.method == "POST":
+
+        member.full_name = request.form.get(
+            "full_name"
+        )
+
+        member.gender = request.form.get(
+            "gender"
+        )
+
+        age = request.form.get(
+            "age"
+        )
+
+
+        if age:
+
+            member.age = int(age)
+
+        else:
+
+            member.age = None
+
+
+        member.phone = request.form.get(
+            "phone"
+        )
+
+        member.department = request.form.get(
+            "department"
+        )
+
+        member.date_joined = request.form.get(
+            "date_joined"
+        )
+
+        member.status = request.form.get(
+            "status"
+        )
+
+
+        db.session.commit()
+
+
+        return redirect(
+            url_for("members")
+        )
+
+
+    # SHOW EDIT PAGE
+
+    return render_template(
+        "edit_member.html",
+        member=member
+    )
+
+
+# ==========================================
+# DELETE MEMBER
+# ==========================================
+
+@app.route(
+    "/delete-member/<int:member_id>"
+)
+def delete_member(member_id):
+
+    member = Member.query.get_or_404(
+        member_id
+    )
+
+
+    # Delete attendance records belonging
+    # to this member first
+
+    Attendance.query.filter_by(
+        member_id=member.id
+    ).delete(
+        synchronize_session=False
+    )
+
+
+    # Delete member
+
+    db.session.delete(
+        member
+    )
+
+
+    db.session.commit()
+
+
+    return redirect(
+        url_for("members")
     )
 
 
